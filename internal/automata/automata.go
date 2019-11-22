@@ -6,52 +6,50 @@ import (
 	"strings"
 )
 
-func getNeighbors(s []uint, me int) [3]uint {
-	sLen := len(s)
-	if sLen < 3 {
-		return [3]uint{0, 0, 0}
-	}
+func getNeighbors(state []uint, myPos int) [3]uint {
+	stateLen := len(state)
 
-	if me == 0 {
-		return [3]uint{s[sLen-1], s[me], s[1]}
+	if myPos == 0 {
+		return [3]uint{state[stateLen-1], state[myPos], state[1]}
 	}
-	if me == sLen-1 {
-		return [3]uint{s[me-1], s[me], s[0]}
+	if myPos == stateLen-1 {
+		return [3]uint{state[myPos-1], state[myPos], state[0]}
 	}
-	return [3]uint{s[me-1], s[me], s[me+1]}
+	return [3]uint{state[myPos-1], state[myPos], state[myPos+1]}
 }
 
-func updateCell(s []uint, r []uint, i int) uint {
-	neighbors := getNeighbors(s, i)
+func updateCell(state []uint, rule []uint, index int) uint {
+	neighbors := getNeighbors(state, index)
 	ruleIndex := neighbors[2] * 1
 	ruleIndex += neighbors[1] * 2
 	ruleIndex += neighbors[0] * 4
-	return r[ruleIndex]
+	return rule[ruleIndex]
 }
 
-func updateState(s []uint, r []uint) []uint {
-	ns := make([]uint, len(s))
-	for i := 0; i < len(s); i++ {
-		ns[i] = updateCell(s, r, i)
+func updateState(state []uint, rule []uint) []uint {
+	ns := make([]uint, len(state))
+	for i := len(state) - 1; i >= 0; i-- {
+		ns[i] = updateCell(state, rule, i)
 	}
 	return ns
 }
 
 func ruleFromInt(n int) []uint {
-	rule := make([]uint, 8)
-	i := 0
-	for i < 8 {
+	const ruleSize int = 8
+	rule := make([]uint, ruleSize)
+
+	for i := 0; i < ruleSize; i++ {
 		rule[i] = uint(n % 2)
 		n = n >> 1
-		i++
 	}
+
 	return rule
 }
 
-// NewSystem creates an elementary cellular automata system with the provided rule number
-// the default state is "00001000"
+// NewSystem creates an elementary cellular automata system
+// with the provided rule number
 func NewSystem(ruleNumber int) System {
-	state := []uint{0, 0, 0, 0, 1, 0, 0, 0}
+	state := []uint{0, 0, 0, 0, 1, 0, 0, 0} // dummy initial state
 	rule := ruleFromInt(ruleNumber)
 	return System{state, rule}
 }
