@@ -11,9 +11,9 @@ func main() {
 
 	rule, steps, initialState := parseFlags()
 
-	system := automata.NewSystem(rule)
-	if err := system.SetState(initialState); err != nil {
-		fmt.Printf("Error: %v", err)
+	system, err := automata.NewSystem(rule, initialState)
+	if err != nil {
+		fmt.Printf("Error: %v\nQuitting...", err)
 		return
 	}
 

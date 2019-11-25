@@ -34,7 +34,11 @@ func updateState(state []uint, rule []uint) []uint {
 	return ns
 }
 
-func ruleFromInt(n int) []uint {
+func newRule(n int) ([]uint, error) {
+	if n < 0 || n > 255 {
+		return []uint{}, errors.New("rule number out of bounds (0-255)")
+	}
+
 	const ruleSize int = 8
 	rule := make([]uint, ruleSize)
 
@@ -43,15 +47,21 @@ func ruleFromInt(n int) []uint {
 		n = n >> 1
 	}
 
-	return rule
+	return rule, nil
 }
 
 // NewSystem creates an elementary cellular automata system
-// with the provided rule number
-func NewSystem(ruleNumber int) System {
-	state := []uint{0, 0, 0, 0, 1, 0, 0, 0} // dummy initial state
-	rule := ruleFromInt(ruleNumber)
-	return System{state, rule}
+// with the provided rule number and initial state
+func NewSystem(ruleNumber int, initialState string) (System, error) {
+	state, err := newState(initialState)
+	if err != nil {
+		return System{}, err
+	}
+	rule, err := newRule(ruleNumber)
+	if err != nil {
+		return System{}, err
+	}
+	return System{state, rule}, nil
 }
 
 // String gives the state of the system as a string
@@ -72,8 +82,7 @@ func (sys *System) Step() {
 	return
 }
 
-// SetState set the system state manually
-func (sys *System) SetState(str string) error {
+func newState(str string) ([]uint, error) {
 	state := []uint{}
 	for _, char := range str {
 		if char == '1' {
@@ -83,8 +92,7 @@ func (sys *System) SetState(str string) error {
 		}
 	}
 	if len(state) < 3 {
-		return errors.New("invalid state")
+		return []uint{}, errors.New("invalid state")
 	}
-	sys.state = state
-	return nil
+	return state, nil
 }
