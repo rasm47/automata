@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/ruoskija/automata/internal/automata"
+	"github.com/rasm47/automata/internal/automata"
 )
 
 func main() {
